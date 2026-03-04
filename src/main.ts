@@ -14,9 +14,16 @@ async function bootstrap() {
   const port = configService.get<number>('port') || 5000;
   const frontendUrl = configService.get<string>('frontend.url') || 'http://localhost:3000';
 
-  // Enable CORS - whitelist frontend ports (3000 for main app, 4000 for admin portal)
+  // Parse multiple frontend URLs from env variable
+  const frontendUrlsEnv = configService.get<string>('frontend.urls') || '';
+  const frontendUrls = frontendUrlsEnv
+    .split(',')
+    .map(url => url.trim())
+    .filter(url => url.length > 0);
+
+  // Enable CORS - whitelist frontend domains from env
   app.enableCors({
-    origin: [
+    origin: frontendUrls.length > 0 ? frontendUrls : [
       frontendUrl,
       'http://localhost:3000',
       'http://127.0.0.1:3000',
