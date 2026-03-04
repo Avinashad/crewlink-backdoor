@@ -1,0 +1,26 @@
+-- Phase 1 migrations applied via Supabase MCP
+-- This file documents the schema changes for the hybrid architecture.
+-- Actual migrations were applied remotely. See ARCHITECTURE_PLAN.md for full details.
+--
+-- Tables created:
+-- - app_settings
+-- - document_type_configs
+-- - profile_tab_configs
+-- - profile_field_configs
+-- - profile_field_values
+-- - onboarding_flow_configs
+-- - onboarding_flow_steps
+-- - user_onboarding_responses
+-- - verification_criteria
+-- - verification_badge_configs
+-- - user_verifications
+-- - user_badges
+-- - worker_languages
+-- - worker_certifications
+-- - work_history
+-- - reviews
+-- - job_document_requirements
+-- - application_documents
+-- - worker_search_mv (materialized view)
+--
+-- Columns added to: personal_profiles, worker_profiles, job_posts, organizations, user_documents
