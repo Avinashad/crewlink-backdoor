@@ -197,10 +197,13 @@ export class AuthService {
   }
 
   async forgotPassword(forgotPasswordDto: ForgotPasswordDto): Promise<{ message: string }> {
-    const { email } = forgotPasswordDto;
+    const { email, redirectUrl } = forgotPasswordDto;
+
+    const allowedUrls: string[] = this.configService.get('frontend.urls') || ['http://localhost:3000'];
+    const baseUrl = redirectUrl && allowedUrls.includes(redirectUrl) ? redirectUrl : allowedUrls[0];
 
     const { error } = await this.supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${this.configService.get('frontend.url')}/auth/callback`,
+      redirectTo: `${baseUrl}/auth/callback`,
     });
 
     if (error) {

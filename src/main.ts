@@ -12,24 +12,11 @@ async function bootstrap() {
 
   const configService = app.get(ConfigService);
   const port = configService.get<number>('port') || 5000;
-  const frontendUrl = configService.get<string>('frontend.url') || 'http://localhost:3000';
-
-  // Parse multiple frontend URLs from env variable
-  const frontendUrlsEnv = configService.get<string>('frontend.urls') || '';
-  const frontendUrls = frontendUrlsEnv
-    .split(',')
-    .map(url => url.trim())
-    .filter(url => url.length > 0);
+  const frontendUrls = configService.get<string[]>('frontend.urls') || ['http://localhost:3000'];
 
   // Enable CORS - whitelist frontend domains from env
   app.enableCors({
-    origin: frontendUrls.length > 0 ? frontendUrls : [
-      frontendUrl,
-      'http://localhost:3000',
-      'http://127.0.0.1:3000',
-      'http://localhost:4000',
-      'http://127.0.0.1:4000',
-    ],
+    origin: frontendUrls,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     credentials: true,
     allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'Origin', 'X-Requested-With'],
@@ -77,9 +64,8 @@ async function bootstrap() {
 ║                                                               ║
 ║   Server running at: http://localhost:${port}                   ║
 ║   Swagger docs at:   http://localhost:${port}/api/docs          ║
-║   Frontend URL:      ${frontendUrl}                       ║
-║                                                               ║
-║   CORS enabled for: localhost:3000, localhost:4000            ║
+║   CORS enabled for: ${frontendUrls.join(', ')}
+║
 ║                                                               ║
 ╚═══════════════════════════════════════════════════════════════╝
   `);

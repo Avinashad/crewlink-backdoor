@@ -12,7 +12,10 @@ export default () => ({
     serviceRoleKey: process.env.SUPABASE_SERVICE_ROLE_KEY,
   },
   frontend: {
-    url: process.env.FRONTEND_URL || 'http://localhost:3000',
+    urls: (process.env.FRONTEND_URLS || 'http://localhost:3000')
+      .split(',')
+      .map((url: string) => url.trim())
+      .filter((url: string) => url.length > 0),
   },
   twilio: {
     accountSid: process.env.TWILIO_ACCOUNT_SID,
