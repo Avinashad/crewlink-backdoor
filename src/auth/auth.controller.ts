@@ -127,8 +127,11 @@ export class AuthController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Resend email verification' })
   @ApiResponse({ status: 200, description: 'Verification email sent' })
-  async resendVerificationEmail(@CurrentUser('email') email: string) {
-    return this.authService.sendVerificationEmail(email);
+  async resendVerificationEmail(
+    @CurrentUser('email') email: string,
+    @Body('redirectUrl') redirectUrl?: string,
+  ) {
+    return this.authService.sendVerificationEmail(email, redirectUrl);
   }
 
   @UseGuards(JwtAuthGuard)

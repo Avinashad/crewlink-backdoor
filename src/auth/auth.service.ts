@@ -49,8 +49,13 @@ export class AuthService {
     private readonly organizationsService: OrganizationsService,
   ) {}
 
+  private resolveRedirectUrl(redirectUrl?: string): string {
+    const allowedUrls: string[] = this.configService.get('frontend.urls') || ['http://localhost:3000'];
+    return redirectUrl && allowedUrls.includes(redirectUrl) ? redirectUrl : allowedUrls[0];
+  }
+
   async signup(signupDto: SignupDto, clientIp?: string | null): Promise<AuthResponse> {
-    const { email, password, firstName, lastName, phoneExtension, phoneNumber, userType, countryCode, inviteCode } =
+    const { email, password, firstName, lastName, phoneExtension, phoneNumber, userType, countryCode, inviteCode, redirectUrl } =
       signupDto;
 
     let finalCountryCode = countryCode;
@@ -85,11 +90,13 @@ export class AuthService {
     }
 
     // Use Supabase Auth to create user
+    const baseUrl = this.resolveRedirectUrl(redirectUrl);
     const { data: authData, error: authError } = await this.supabase.auth.signUp({
       email,
       password,
       options: {
         data: userMetadata,
+        emailRedirectTo: `${baseUrl}/auth/callback`,
       },
     });
 
@@ -199,8 +206,7 @@ export class AuthService {
   async forgotPassword(forgotPasswordDto: ForgotPasswordDto): Promise<{ message: string }> {
     const { email, redirectUrl } = forgotPasswordDto;
 
-    const allowedUrls: string[] = this.configService.get('frontend.urls') || ['http://localhost:3000'];
-    const baseUrl = redirectUrl && allowedUrls.includes(redirectUrl) ? redirectUrl : allowedUrls[0];
+    const baseUrl = this.resolveRedirectUrl(redirectUrl);
 
     const { error } = await this.supabase.auth.resetPasswordForEmail(email, {
       redirectTo: `${baseUrl}/auth/callback`,
@@ -248,10 +254,14 @@ export class AuthService {
     return { message: 'Password reset successfully' };
   }
 
-  async sendVerificationEmail(email: string): Promise<{ message: string }> {
+  async sendVerificationEmail(email: string, redirectUrl?: string): Promise<{ message: string }> {
+    const baseUrl = this.resolveRedirectUrl(redirectUrl);
     const { error } = await this.supabase.auth.resend({
       type: 'signup',
       email,
+      options: {
+        emailRedirectTo: `${baseUrl}/auth/callback`,
+      },
     });
 
     if (error) {

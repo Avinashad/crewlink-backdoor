@@ -1,6 +1,7 @@
 import {
   IsEmail,
   IsString,
+  IsUrl,
   MinLength,
   IsOptional,
   IsEnum,
@@ -85,4 +86,9 @@ export class SignupDto {
   @IsOptional()
   @IsString()
   inviteCode?: string;
+
+  @ApiPropertyOptional({ example: 'http://localhost:3000', description: 'Frontend URL for email verification redirect' })
+  @IsOptional()
+  @IsUrl({ require_tld: false })
+  redirectUrl?: string;
 }
